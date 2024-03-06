@@ -17,6 +17,8 @@ type Props = TouchableOpacityProps & {
 }
 
 export function Recipe({ recipe, ...rest }: Props) {
+  console.log(recipe)
+
   return (
     <TouchableOpacity style={styles.container} activeOpacity={0.8} {...rest}>
       <ImageBackground source={{ uri: recipe.image }} style={styles.image}>

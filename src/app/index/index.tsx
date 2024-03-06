@@ -3,12 +3,15 @@ import {router} from 'expo-router'
 
 import {styles} from './styles'
 
-import { useState } from "react";
+import {services} from "@/services"
+
+import { useState, useEffect } from "react";
 import { Selected } from "@/components/Selected";
 import { Ingredient } from "@/components/Ingredient";
 
 export default function Index() {
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState<string[]>([])
+  const [ingredients, setIngredients] = useState<IngredientResponse[]>([])
 
   function handleToggleSelected(value: string) {
     if(selected.includes(value)) {
@@ -16,7 +19,6 @@ export default function Index() {
     }
 
     setSelected((state) => [...state, value])
-    console.log(selected)
   }
 
   function handleClearSelected() {
@@ -27,8 +29,12 @@ export default function Index() {
   }
 
   function handleSearch() {
-    router.navigate("/recipes/")
+    router.navigate("/recipes/" + selected)
   }
+
+  useEffect(() => {
+    services.ingredientes.findAll().then(setIngredients)
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -39,16 +45,16 @@ export default function Index() {
         </Text>
       </Text>
 
-      <Text style={styles.message}>Descubra eceitas baseadas nos produtos que você escolheu.</Text>
+      <Text style={styles.message}>Descubra receitas baseadas nos produtos que você escolheu.</Text>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.ingredients}>
-        {Array.from({length: 50}).map((item, index) => (
+        {ingredients.map((item) => (
           <Ingredient
-            key={index}
-            name="tomate"
-            image=""
-            selected={selected.includes(String(index))}
-            onPress={() => handleToggleSelected(String(index))}
+            key={item.id}
+            name={item.name}
+            image={`${services.storage.imagePath}/${item.image}`}
+            selected={selected.includes(item.id)}
+            onPress={() => handleToggleSelected(item.id)}
           />
         ))}
 
